@@ -1,5 +1,7 @@
 <?php
 
+use App\Application\UseCases\ExportRegistration\ExportRegistration;
+use App\Application\UseCases\ExportRegistration\InputBoundary;
 use App\Domain\Entities\Registration;
 use App\Domain\ValueObjects\Cpf;
 use App\Domain\ValueObjects\Email;
@@ -14,5 +16,12 @@ $registration->setName('wslmacieira')
     ->setRegistrationAt(new DateTimeImmutable())
     ->setRegistrationNumber(new Cpf('01234567890'));
 
-echo '<pre>';
-print_r($registration);
+// Use cases
+
+$loadRegistrationRepo = new stdClass();
+$pdfExporter = new stdClass();
+$storage = new stdClass();
+
+$exportRegistrationUseCase = new ExportRegistration($loadRegistrationRepo, $pdfExporter, $storage);
+$inputBoundary = new InputBoundary('01234567890', 'xpto', __DIR__ . '/../storage');
+$output = $exportRegistrationUseCase->handle(($inputBoundary));
