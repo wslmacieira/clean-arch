@@ -1,20 +1,23 @@
 <?php
 
 use App\Application\UseCases\ExportRegistration\ExportRegistration;
-use App\Application\UseCases\ExportRegistration\InputBoundary;
 use App\Domain\Entities\Registration;
 use App\Domain\ValueObjects\Cpf;
 use App\Domain\ValueObjects\Email;
 use App\Infra\Adapters\Html2PdfAdapter;
 use App\Infra\Adapters\LocalstorageAdapter;
+use App\Infra\Http\Controllers\ExportRegistrationController;
+use App\Infra\Presentation\ExportRegistrationPresenter;
 use App\Infra\Repositories\MySQL\PdoRegistrationRepository;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $appConfig = require_once __DIR__ . '/../config/app.php';
 
 $registration = new Registration();
- 
+
 $registration->setName('wslmacieira')
     ->setBirthDate(new DateTimeImmutable('1977-12-11'))
     ->setEmail(new Email('wslmacieira@gmail.com'))
@@ -31,22 +34,27 @@ $dsn = sprintf(
 );
 
 $pdo = new PDO($dsn, $appConfig['db']['username'], $appConfig['db']['password'], [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_PERSISTENT => TRUE
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_PERSISTENT => TRUE
 ]);
 
 $loadRegistrationRepo = new PdoRegistrationRepository($pdo);
-
-$entity = $loadRegistrationRepo->loadByRegistrationNumber(new Cpf('01234567890'));
-
-echo '<pre>';
-print_r($entity);
-die;
-
 $pdfExporter = new Html2PdfAdapter();
 $storage = new LocalstorageAdapter();
 
 $exportRegistrationUseCase = new ExportRegistration($loadRegistrationRepo, $pdfExporter, $storage);
-$inputBoundary = new InputBoundary('01234567890', 'xpto', __DIR__ . '/../storage');
-$output = $exportRegistrationUseCase->handle(($inputBoundary));
+$request = new Request('GET', 'http://localhost:3000');
+$response = new Response();
+
+//Controllers
+
+$exportRegistrationController = new ExportRegistrationController(
+    $request,
+    $response,
+    $exportRegistrationUseCase
+);
+
+$exportRegistrationPresenter = new ExportRegistrationPresenter();
+
+echo $exportRegistrationController->handle($exportRegistrationPresenter);

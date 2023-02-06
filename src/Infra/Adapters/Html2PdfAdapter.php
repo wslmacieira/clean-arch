@@ -6,8 +6,8 @@ namespace App\Infra\Adapters;
 
 use App\Application\Interfaces\ExportRegistrationPdfExporter;
 use App\Domain\Entities\Registration;
-use HTML2PDF;
-use HTML2PDF_exception;
+use Exception;
+use Spipu\Html2Pdf\Html2Pdf;
 
 final class Html2PdfAdapter implements ExportRegistrationPdfExporter
 {
@@ -23,7 +23,7 @@ final class Html2PdfAdapter implements ExportRegistrationPdfExporter
             );
 
             return $html2pdf->output('', 'S');
-        } catch (HTML2PDF_exception $e) {
+        } catch (Exception $e) {
             $html2pdf->clean();
 
             $formatter = new ExceptionFormatter($e);

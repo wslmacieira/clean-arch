@@ -10,9 +10,10 @@ final class InputBoundary
     private string $pdfFileName;
     private string $path;
 
-    public function __construct(string $registrationNumber, string $pdfFilename, string $path) {
+    public function __construct(string $registrationNumber, string $pdfFilename, string $path)
+    {
         $this->registrationNumber = $registrationNumber;
-        $this-> $pdfFilename = $pdfFilename;
+        $this->pdfFileName = $pdfFilename;
         $this->path = $path;
     }
 
@@ -24,17 +25,19 @@ final class InputBoundary
         return $this->registrationNumber;
     }
 
-	/**
-	 * @return string
-	 */
-	public function getPdfFileName(): string {
-		return $this->pdfFileName;
-	}
+    /**
+     * @return string
+     */
+    public function getPdfFileName(): string
+    {
+        return $this->pdfFileName;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getPath(): string {
-		return $this->path;
-	}
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
 }
